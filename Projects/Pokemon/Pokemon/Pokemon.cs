@@ -12,10 +12,10 @@ namespace Pokemon.Pokemon
         public Element Element { get; init; }
         public int AttackPower { get; private set; }
         public int TotalHealth { get; private set; }
-        public int CurrentHealth { get; set; }
+        public int CurrentHealth { get; private set; }
         public int Speed { get; private set; }
-        public int Level { get; private set; } = 1;
-        public int Experience { get; private set; } = 0;
+        public int Level { get; private set; } = Constants.StartingLevel;
+        public int Experience { get; private set; } = Constants.StartingExperience;
 
 
         // random generator
@@ -25,13 +25,13 @@ namespace Pokemon.Pokemon
         public Pokemon()
         {
             // generate random stats
-            AttackPower = random.Next(1, 11);
-            TotalHealth = random.Next(1, 11);
+            AttackPower = random.Next(Constants.MinAttackPower, Constants.MaxAttackPower);
+            TotalHealth = random.Next(Constants.MinHealth, Constants.MaxHealt);
             CurrentHealth = TotalHealth;
-            Speed = random.Next(1, 11);
+            Speed = random.Next(Constants.MinSpeed, Constants.MaxSpeed);
 
             // generate random element
-            Element = (Element)random.Next(1, 4);
+            Element = Element.RandomElement();
         }
 
         public Pokemon(string name) : this()
@@ -44,19 +44,18 @@ namespace Pokemon.Pokemon
         {
             Experience += experience;
 
-            // 100 experience equals to one level
-            while(Experience >= 100)
+            while (Experience >= Constants.ExperienceInLevel)
             {
                 LevelUp();
-                Experience -= 100;
             }
         }
 
         private void LevelUp()
         {
             Level++;
-            AttackPower += random.Next(1, 6);
-            TotalHealth += random.Next(1, 6);
+            Experience -= Constants.ExperienceInLevel;
+            AttackPower += random.Next(Constants.LevelUpAttackPowerMinGain, Constants.LevelUpAttackPowerMaxGain);
+            TotalHealth += random.Next(Constants.LevelUpHealthMinGain, Constants.LevelUpHealthMaxGain);
         }
 
         // Attacks
@@ -65,38 +64,34 @@ namespace Pokemon.Pokemon
             int damage = enemy.AttackDamage(this);
             CurrentHealth -= damage;
 
-            // console output
-            Console.ForegroundColor = enemy.GetConsoleColor();
-            Console.Write($"{enemy.Name}");
-            Console.ResetColor();
-            Console.Write($" dealt {damage} damage to");
-            Console.ForegroundColor = GetConsoleColor();
-            Console.Write($" {Name}.");
-            Console.ResetColor();
+            // example: Maritide dealt 2 damage to Photosprout.
+            enemy.PrintName();
+            Console.Write($" dealt {damage} damage to ");
+            PrintName();
+            Console.Write(". ");
+
 
             if (CurrentHealth <= 0)
             {
-                Console.ForegroundColor = GetConsoleColor();
-                Console.Write($" {Name}");
-                Console.ResetColor();
+                // example: Photosprout is defeated!
+                PrintName();
                 Console.WriteLine(" is defeated!");
             }
             else
             {
-                Console.ForegroundColor = GetConsoleColor();
-                Console.Write($"\n{Name}");
-                Console.ResetColor();
+                Console.WriteLine();
+                PrintName();
                 Console.WriteLine($" has currently {CurrentHealth} HP.");
             }
         }
 
         public int AttackDamage(Pokemon enemy)
         {
-            if((Element == Element.Fire && enemy.Element == Element.Grass)
+            if ((Element == Element.Fire && enemy.Element == Element.Grass)
                 || (Element == Element.Water && enemy.Element == Element.Fire)
                 || (Element == Element.Grass && enemy.Element == Element.Water))
             {
-                return AttackPower * 2;
+                return AttackPower * Constants.CritDamageModifier;
             }
 
             return AttackPower;
@@ -105,13 +100,17 @@ namespace Pokemon.Pokemon
         // Info
         public void ShowInfo()
         {
-            Console.ForegroundColor = GetConsoleColor();
-            Console.Write($"{Name}");
-            Console.ResetColor();
+            PrintName();
             Console.WriteLine($": {AttackPower} Attack, {CurrentHealth} HP, {Speed} Speed");
         }
 
-        public ConsoleColor GetConsoleColor()
+        public void ShowInfoPlayer()
+        {
+            PrintName();
+            Console.WriteLine($": {AttackPower} Attack, {CurrentHealth} HP, {Speed} Speed, level {Level}, {Experience}/{Constants.ExperienceInLevel} XP");
+        }
+
+        private ConsoleColor GetConsoleColor()
         {
             return Element switch
             {
@@ -122,5 +121,12 @@ namespace Pokemon.Pokemon
             };
         }
 
+        public void PrintName()
+        {
+            Console.ForegroundColor = GetConsoleColor();
+            Console.Write(Name);
+            Console.ResetColor();
+
+        }
     }
 }

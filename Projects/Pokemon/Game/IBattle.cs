@@ -14,7 +14,7 @@ namespace Pokemon.Game
         /// <param name="player">Player trainer</param>
         /// <param name="enemy">Enemy trainer</param>
         /// <returns>Winner trainer</returns>
-        //TODO:
+        public Trainer.Trainer TrainerBattle(Trainer.Player player, Trainer.Enemy enemy);
 
         /// <summary>
         /// Performs one round of a battle between two FImons.
@@ -22,6 +22,6 @@ namespace Pokemon.Game
         /// <param name="playerFImon">Player trainer's FImon</param>
         /// <param name="enemyFImon">Enemy trainer's FImon</param>
         /// <returns>Winner FImon</returns>
-        public Pokemon.Pokemon BattleRound(Pokemon.Pokemon playerFImon, Pokemon.Pokemon enemyFImon);
+        public Pokemon.Pokemon PokemonBattle(Pokemon.Pokemon playerFImon, Pokemon.Pokemon enemyFImon);
     }
 }

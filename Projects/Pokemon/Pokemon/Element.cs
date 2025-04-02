@@ -8,9 +8,17 @@ namespace Pokemon.Pokemon
 {
     public enum Element
     {
-        None,
         Fire,
         Water,
         Grass
+    }
+
+    public static class ElementExtensions
+    {
+        public static Element RandomElement(this Element element)
+        {
+            var values = Enum.GetValues(typeof(Element));
+            return (Element)values.GetValue(Random.Shared.Next(values.Length));
+        }
     }
 }
