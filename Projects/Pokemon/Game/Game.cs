@@ -94,6 +94,7 @@ namespace Pokemon.Game
                 FormatError();
             }
 
+            Console.WriteLine();
         }
 
         private void GameNotStarted()
@@ -125,11 +126,41 @@ namespace Pokemon.Game
             {
                 Console.WriteLine("All enemies have been defeated.");
             }
+
+            Console.WriteLine();
         }
 
         private void FightCommand()
         {
-            // TODO
+            Trainer.Enemy currentEnemy;
+
+            switch (player.BattlesWon)
+            {
+                case 0:
+                    currentEnemy = firstEnemy;
+                    break;
+                case 1:
+                    currentEnemy = secondEnemy;
+
+                    break;
+                case 2:
+                    currentEnemy = thirdEnemy;
+                    break;
+                default:
+                    currentEnemy = null;
+                    break;
+            }
+
+            if(currentEnemy != null)
+            {
+                TrainerBattle(player, currentEnemy);
+            }
+            else
+            {
+                Console.WriteLine("All enemies have been defeated.");
+            }
+
+            Console.WriteLine();
         }
 
         private void InfoCommand()
@@ -141,6 +172,7 @@ namespace Pokemon.Game
             }
 
             player.Info();
+            Console.WriteLine();
         }
 
         private void SortCommand()
@@ -152,6 +184,7 @@ namespace Pokemon.Game
             }
 
             player.SortPokemons();
+            Console.WriteLine();
         }
 
         private void QuitCommand()
@@ -174,29 +207,31 @@ namespace Pokemon.Game
         }
 
         // IBattle interface
-        public Pokemon.Pokemon PokemonBattle(Pokemon.Pokemon playerFImon, Pokemon.Pokemon enemyFImon)
+        public Pokemon.Pokemon PokemonBattle(Pokemon.Pokemon playerPokemon, Pokemon.Pokemon enemyPokemon)
         {
+            playerPokemon.PrintName();
+            Console.Write(" vs ");
+            enemyPokemon.PrintName();
             Console.WriteLine();
-            Console.WriteLine($"{playerFImon.Name} vs {enemyFImon.Name}");
 
-            Pokemon.Pokemon winner = playerFImon;
+            Pokemon.Pokemon winner = playerPokemon;
 
             // find the faster FImon (or the player if they have the same speed)
             Pokemon.Pokemon first;
             Pokemon.Pokemon second;
-            if(playerFImon.Speed >= enemyFImon.Speed)
+            if(playerPokemon.Speed >= enemyPokemon.Speed)
             {
-                first = playerFImon;
-                second = enemyFImon;
+                first = playerPokemon;
+                second = enemyPokemon;
             }
             else
             {
-                first = enemyFImon;
-                second = playerFImon;
+                first = enemyPokemon;
+                second = playerPokemon;
             }
 
             // pokemons will take turns attacking
-            while(playerFImon.CurrentHealth > 0 && enemyFImon.CurrentHealth > 0)
+            while(playerPokemon.CurrentHealth > 0 && enemyPokemon.CurrentHealth > 0)
             {
                 // first FImon attacks
                 second.TakeDamage(first);
@@ -220,8 +255,41 @@ namespace Pokemon.Game
 
         public Trainer.Trainer TrainerBattle(Player player, Enemy enemy)
         {
-            throw new NotImplementedException();
-            // TODO
+            // create Queues for Player and his current enemy
+            Queue<Pokemon.Pokemon> playerPokemons = player.GetPokemons();
+            Queue<Pokemon.Pokemon> enemyPokemons = enemy.GetPokemons();
+
+            // then peek from each queue and initiate a duel between pokemons, the looser pokemon is dequeued
+            for (int round = 1; playerPokemons.Count > 0 && enemyPokemons.Count > 0; round++)
+            {
+                Pokemon.Pokemon playerPokemon = playerPokemons.Peek();
+                Pokemon.Pokemon enemyPokemon = enemyPokemons.Peek();
+
+                Console.Write($"Round {round}: ");
+                Pokemon.Pokemon winner = PokemonBattle(playerPokemon, enemyPokemon);
+                if (winner == playerPokemon)
+                {
+                    enemyPokemons.Dequeue();
+                }
+                else
+                {
+                    playerPokemons.Dequeue();
+                }
+            }
+
+            // fight until one of the queues is empty => empty queue means the trainer has lost
+            if(playerPokemons.Count > 0)
+            {
+                player.WinBattle();
+                enemy.BattleFinished();
+                return player;
+            }
+            else
+            {
+                player.LoseBattle();
+                enemy.BattleFinished();
+                return enemy;
+            }
         }
 
         // IGame interface

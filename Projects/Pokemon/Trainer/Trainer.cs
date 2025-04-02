@@ -35,5 +35,10 @@ namespace Pokemon.Trainer
 
             Pokemons.Add(pokemon);
         }
+
+        public Queue<Pokemon.Pokemon> GetPokemons()
+        {
+            return new Queue<Pokemon.Pokemon>(Pokemons);
+        }
     }
 }

@@ -23,5 +23,14 @@ namespace Pokemon.Trainer
                 pokemon.ShowInfo();
             }
         }
+
+        public void BattleFinished()
+        {
+            // reset pokemons health for next battle
+            foreach (Pokemon.Pokemon pokemon in Pokemons)
+            {
+                pokemon.ResetHealth();
+            }
+        }
     }
 }

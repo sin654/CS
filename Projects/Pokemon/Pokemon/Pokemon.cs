@@ -40,14 +40,25 @@ namespace Pokemon.Pokemon
         }
 
         // Levels & Experience
-        public void GainExperience(int experience)
+
+        /// <summary>
+        /// Gain experience and level up if needed.
+        /// </summary>
+        /// <param name="experience">Experience gained</param>
+        /// <returns>true if pokemon level increased, false otherwise</returns>
+        public bool GainExperience(int experience)
         {
+            bool leveledUp = false;
+
             Experience += experience;
 
             while (Experience >= Constants.ExperienceInLevel)
             {
                 LevelUp();
+                leveledUp = true;
             }
+
+            return leveledUp;
         }
 
         private void LevelUp()
@@ -83,6 +94,12 @@ namespace Pokemon.Pokemon
                 PrintName();
                 Console.WriteLine($" has currently {CurrentHealth} HP.");
             }
+        }
+
+        // Battle
+        public void ResetHealth()
+        {
+            CurrentHealth = TotalHealth;
         }
 
         public int AttackDamage(Pokemon enemy)

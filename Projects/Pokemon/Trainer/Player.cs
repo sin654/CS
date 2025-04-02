@@ -11,6 +11,9 @@ namespace Pokemon.Trainer
         public Player(string name) : base(name) { }
         public int BattlesWon { get; private set; } = 0;
 
+        // random generator
+        private static readonly Random random = new Random();
+
         public bool PokemonsSelected()
         {
             return Pokemons.Count == 3;
@@ -96,6 +99,68 @@ namespace Pokemon.Trainer
                 Pokemons[i].PrintName();
             }
             Console.WriteLine();
+        }
+
+        // Battles and rounds
+        public void WinBattle()
+        {
+            BattlesWon++;
+            int expGain = random.Next(Constants.ExperienceForWinMin, Constants.ExperienceForWinMax);
+
+            // get XP to pokemons
+            bool leveledUp = false;
+            foreach (Pokemon.Pokemon pokemon in Pokemons)
+            {
+                if(pokemon.GainExperience(expGain))
+                {
+                    leveledUp = true;
+                }
+            }
+
+            if (leveledUp)
+            {
+                Console.WriteLine($"You won the battle! Pokemons gained {expGain} XP! Your pokemons leveled up!");
+            }
+            else
+            {
+                Console.WriteLine($"You won the battle! Pokemons gained {expGain} XP!");
+            }
+
+            // reset pokemons health for next battle
+            foreach (Pokemon.Pokemon pokemon in Pokemons)
+            {
+                pokemon.ResetHealth();
+            }
+        }
+
+        public void LoseBattle()
+        {
+            int expGain = random.Next(Constants.ExperienceForLooseMin, Constants.ExperienceForLooseMax);
+
+            // get XP to pokemons
+            bool leveledUp = false;
+            foreach (Pokemon.Pokemon pokemon in Pokemons)
+            {
+                if (pokemon.GainExperience(expGain))
+                {
+                    leveledUp = true;
+                }
+            }
+
+            if (leveledUp)
+            {
+                Console.WriteLine($"You lost the battle! Pokemons gained {expGain} XP! Your pokemons leveled up!");
+            }
+            else
+            {
+                Console.WriteLine($"You lost the battle! Pokemons gained {expGain} XP!");
+            }
+
+            // reset pokemons health for next battle
+            foreach (Pokemon.Pokemon pokemon in Pokemons)
+            {
+                pokemon.ResetHealth();
+            }
         }
     }
 }

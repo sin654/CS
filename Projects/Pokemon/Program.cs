@@ -1,6 +1,4 @@
-﻿
-
-namespace Pokemon
+﻿namespace Pokemon
 {
     internal class Program
     {

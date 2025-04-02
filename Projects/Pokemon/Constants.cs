@@ -9,15 +9,19 @@ namespace Pokemon
 {
     static class Constants
     {
+        /*
+         * Value, which have MIN & MAX in name, are used in random generator as upper bound (not inclusive)
+         * */
+
         // Base stats
         public const int MinAttackPower = 1;
-        public const int MaxAttackPower = 11; // used in random generator as upper bound (not inclusive)
+        public const int MaxAttackPower = 11;
 
         public const int MinSpeed = 1;
-        public const int MaxSpeed = 11; // used in random generator as upper bound (not inclusive)
+        public const int MaxSpeed = 11;
 
         public const int MinHealth = 1;
-        public const int MaxHealt = 11; // used in random generator as upper bound (not inclusive)
+        public const int MaxHealt = 11;
         public const int StartingLevel = 1;
         public const int StartingExperience = 0;
 
@@ -26,6 +30,12 @@ namespace Pokemon
 
         // Levels
         public const int ExperienceInLevel = 100; // experience needed to level up
+
+        public const int ExperienceForWinMin = 50;
+        public const int ExperienceForWinMax = 151;
+        public const int ExperienceForLooseMin = 10;
+        public const int ExperienceForLooseMax = 71;
+
         public const int LevelUpAttackPowerMinGain = 1;
         public const int LevelUpAttackPowerMaxGain = 6;
         public const int LevelUpHealthMinGain = 1;
