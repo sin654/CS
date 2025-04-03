@@ -17,11 +17,11 @@ namespace Pokemon.Game
         public Trainer.Trainer TrainerBattle(Trainer.Player player, Trainer.Enemy enemy);
 
         /// <summary>
-        /// Performs one round of a battle between two FImons.
+        /// Performs one round of a battle between two pokemons.
         /// </summary>
-        /// <param name="playerFImon">Player trainer's FImon</param>
-        /// <param name="enemyFImon">Enemy trainer's FImon</param>
-        /// <returns>Winner FImon</returns>
-        public Pokemon.Pokemon PokemonBattle(Pokemon.Pokemon playerFImon, Pokemon.Pokemon enemyFImon);
+        /// <param name="playerPokemon">Player trainer's pokemon</param>
+        /// <param name="enemyPokemon">Enemy trainer's pokemon</param>
+        /// <returns>Winner pokemon</returns>
+        public Pokemon.Pokemon PokemonBattle(Pokemon.Pokemon playerPokemon, Pokemon.Pokemon enemyPokemon);
     }
 }

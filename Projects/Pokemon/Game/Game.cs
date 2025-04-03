@@ -216,7 +216,7 @@ namespace Pokemon.Game
 
             Pokemon.Pokemon winner = playerPokemon;
 
-            // find the faster FImon (or the player if they have the same speed)
+            // find the faster pokemon (or the player if they have the same speed)
             Pokemon.Pokemon first;
             Pokemon.Pokemon second;
             if(playerPokemon.Speed >= enemyPokemon.Speed)
@@ -233,7 +233,7 @@ namespace Pokemon.Game
             // pokemons will take turns attacking
             while(playerPokemon.CurrentHealth > 0 && enemyPokemon.CurrentHealth > 0)
             {
-                // first FImon attacks
+                // first pokemon attacks
                 second.TakeDamage(first);
                 if(second.CurrentHealth <= 0)
                 {
@@ -241,7 +241,7 @@ namespace Pokemon.Game
                     break;
                 }
 
-                // second FImon attacks
+                // second pokemon attacks
                 first.TakeDamage(second);
                 if (first.CurrentHealth <= 0)
                 {

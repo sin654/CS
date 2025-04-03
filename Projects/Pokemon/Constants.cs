@@ -49,23 +49,16 @@ namespace Pokemon
 
         private static List<string> PokemonNames = new List<string>
         {
-            "Pikachu",
-            "Charmander",
-            "Bulbasaur",
-            "Squirtle",
-            "Supa",
-            "Mer",
-            "Bisu",
-            "Rek",
-            "Tailin",
-            "Kroko",
-            "Barb",
-            "Kro",
-            "Tar",
-            "Beril",
-            "Api",
-            "Tris",
-            "Rabi"
+            "Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Eevee",
+            "Snorlax", "Mewtwo", "Gengar", "Jigglypuff", "Meowth",
+            "Psyduck", "Machamp", "Lapras", "Magikarp", "Vulpix",
+            "Growlithe", "Abra", "Alakazam", "Slowpoke", "Pidgey",
+            "Zubat", "Onix", "Geodude", "Rattata", "Caterpie",
+            "Weedle", "Nidoran", "Clefairy", "Sandshrew", "Diglett",
+            "Poliwag", "Tentacool", "Magnemite", "Doduo", "Seel",
+            "Grimer", "Shellder", "Gastly", "Krabby", "Exeggcute",
+            "Cubone", "Koffing", "Rhyhorn", "Horsea", "Staryu",
+            "Scyther", "Pinsir", "Tauros", "Dratini", "Jynx"
         };
 
         public static string GetRandomPokemonName()
