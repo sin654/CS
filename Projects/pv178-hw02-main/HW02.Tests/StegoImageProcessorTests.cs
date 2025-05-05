@@ -18,7 +18,7 @@ namespace HW02.Tests
             var stegoImageProcessor = new StegoImageProcessor();
 
             var stegoImage = await stegoImageProcessor.EncodePayload(inputImage, inputBytes);
-            var outputBytes = await stegoImageProcessor.ExtractPayload(stegoImage, inputBytes.Length);
+            var outputBytes = await stegoImageProcessor.ExtractPayload(stegoImage);
 
             var output = Encoding.Default.GetString(outputBytes);
 
