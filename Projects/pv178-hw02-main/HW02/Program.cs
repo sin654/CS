@@ -3,10 +3,14 @@ using SixLabors.ImageSharp.PixelFormats;
 using System.Text;
 using SixLabors.ImageSharp;
 
+Console.OutputEncoding = Encoding.UTF8;
+
 const string inputPath = "../../../../Data/";
 const string outputPath = "../../../../Output/";
 
-var stegoObject = StegoObject.LoadObject(Samples.StringSample(), (s) => Encoding.Default.GetBytes(s));
+//var stegoObject = StegoObject.LoadObject(Samples.StringSample(), (s) => Encoding.Default.GetBytes(s)); // OLD
+var stegoObject = StegoObject.LoadObject(Samples.StringSample(), (s) => Encoding.UTF8.GetBytes(s));
+
 
 // Images to encode the stegoObject into
 // Each image must be used to encode a part of the stegoObject
@@ -20,27 +24,37 @@ var imageNames = new[]
     "John_Martin_-_The_Plains_of_Heaven.jpg"
 };
 
-// Do the magic...
-// load the images
+// get the chunk of data for each image
+List<byte[]> dataChunks = stegoObject.GetDataChunks(imageNames.Count()).ToList();
 
-// testing
-var input = "The quick brown fox jumps over the lazy dog";
-var inputBytes = Encoding.Default.GetBytes(input);
-
-var inputImage = await Image.LoadAsync<Rgba32>(Path.Combine(inputPath, "Coat_of_arms_of_Bruntal.jpg"));
 
 var stegoImageProcessor = new StegoImageProcessor();
-
-var stegoImage = await stegoImageProcessor.EncodePayload(inputImage, inputBytes);
-var outputBytes = await stegoImageProcessor.ExtractPayload(stegoImage);
-
-var output = Encoding.Default.GetString(outputBytes);
-Console.WriteLine(output);
-
-//Assert.Equal(input, output);
+// Do the magic...
+// Load the images
+List<string> inputPaths = new();
+foreach (string imageName in imageNames)
+{
+    inputPaths.Add(Path.Combine(inputPath, imageName));
+}
+Image<Rgba32>[] images = await stegoImageProcessor.LoadImagesAsync(inputPaths.ToArray());
 
 // Encode it
-// Decode it
-byte[] decodedData = Array.Empty<byte>();
+Image<Rgba32>[] encodedImages = await stegoImageProcessor.EncodeImagesAsync(images, dataChunks);
 
-Console.WriteLine(Encoding.Default.GetString(decodedData));
+// Save the images
+string[] savedImages = await stegoImageProcessor.SaveImagesAsync(encodedImages, outputPath, imageNames);
+
+// Again load the images, but the encoded ones and decode the data
+Image<Rgba32>[] encodedImagesToDecode = await stegoImageProcessor.LoadImagesAsync(savedImages);
+
+// Decode the data
+byte[][] decodedDataChunks = await stegoImageProcessor.DecodeImagesAsync(encodedImagesToDecode);
+
+List<byte> decodedBytes = new();
+foreach (byte[] dataChunk in decodedDataChunks)
+{
+    decodedBytes.AddRange(dataChunk);
+}
+
+// Print the result
+Console.WriteLine(Encoding.UTF8.GetString(decodedBytes.ToArray()));
