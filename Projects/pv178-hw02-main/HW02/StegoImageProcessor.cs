@@ -11,26 +11,34 @@ namespace HW02
 
         SemaphoreSlim taskLimit = new SemaphoreSlim(3);
 
-        private struct PixelChannel
+        private enum PixelChannel
         {
-            public const int Red = 1;
-            public const int Green = 2;
-            public const int Blue = 4;
-            public const int Alpha = 8;
+            Red = 1,
+            Green = 2,
+            Blue = 4,
+            Alpha = 8
         }
 
-        private struct ChunkSize
+        private enum ChunkSize
         {
-            public const int OneBit = 1;
-            public const int TwoBits = 2;
-            public const int FourBits = 4;
-            public const int EightBits = 8;
+            OneBit = 1,
+            TwoBits = 2,
+            FourBits = 4,
+            EightBits = 8
         }
 
-        private const int HeaderChannel = PixelChannel.Red;
-        private const int DataChannel = PixelChannel.Green;
-        private const int ChunkSizeInBits = ChunkSize.FourBits;
-        private const int ChunksInByte = 8 / ChunkSizeInBits;
+        private struct ImageFormat
+        {
+            public const string Bmp = ".bmp";
+            public const string Png = ".png";
+            public const string Jpeg = ".jpeg";
+        }
+
+        private const PixelChannel HeaderChannel = PixelChannel.Red;
+        private const PixelChannel DataChannel = PixelChannel.Green;
+        private const ChunkSize ChunkSizeInBits = ChunkSize.FourBits;
+        private const int ChunksInByte = 8 / (int)ChunkSizeInBits;
+        private const string ImageFormatToUse = ImageFormat.Bmp; // BMP is the only format that supports 1 bit per channel, PNG and JPEG do not support it. BMP is also the only format that supports 32 bits per pixel (RGBA) and 24 bits per pixel (RGB).
 
         /*
         Image will hold the key for decoding of the payload in its pixels. This key will be located on (Blue) channel of pixels.
@@ -192,7 +200,7 @@ namespace HW02
         /// <returns>Task containing path of the saved image</returns>
         public async Task<string> SaveImageAsync(Image<Rgba32> image, string path)
         {
-            string fullPath = path + ".png";
+            string fullPath = path + ImageFormatToUse;
             await image.SaveAsync(fullPath);
 
             return fullPath;
@@ -214,7 +222,7 @@ namespace HW02
                 foreach (byte b in payload)
                 {
                     // Split the byte into chunks
-                    byte[] chunksInByte = ByteSpliting.Split(b, ChunkSizeInBits).ToArray<byte>();
+                    byte[] chunksInByte = ByteSpliting.Split(b, (int)ChunkSizeInBits).ToArray<byte>();
                     foreach (byte byteChunk in chunksInByte)
                     {
                         chunks.Add(byteChunk);
@@ -222,7 +230,7 @@ namespace HW02
                 }
 
                 // 2. Create header and encode it to picture
-                byte headerFirstByte = (byte)((DataChannel << 4) | (byte)ChunkSizeInBits);
+                byte headerFirstByte = (byte)(((int)DataChannel << 4) | (byte)ChunkSizeInBits);
                 int pixelCount = chunks.Count(); // if bigger than 16 bits, then error?
                 if (pixelCount > ushort.MaxValue)
                 {
@@ -279,7 +287,7 @@ namespace HW02
         {
             byte EncodeByte(byte @byte, byte data)
             {
-                byte mask = (byte)((1 << ChunkSizeInBits) - 1); // e.g., ChunkSizeInBits = 2 → mask = 0b00000011
+                byte mask = (byte)((1 << (int)ChunkSizeInBits) - 1); // e.g., ChunkSizeInBits = 2 → mask = 0b00000011
 
                 // clear N of LSB bits for data
                 byte encodedByte = (byte)(@byte & ~mask);
@@ -401,16 +409,16 @@ namespace HW02
             byte chunk = 0;
             switch (channel)
             {
-                case PixelChannel.Red:
+                case (int)PixelChannel.Red:
                     chunk = (byte)(pixel.R & mask);
                     break;
-                case PixelChannel.Green:
+                case (int)PixelChannel.Green:
                     chunk = (byte)(pixel.G & mask);
                     break;
-                case PixelChannel.Blue:
+                case (int)PixelChannel.Blue:
                     chunk = (byte)(pixel.B & mask);
                     break;
-                case PixelChannel.Alpha:
+                case (int)PixelChannel.Alpha:
                     chunk = (byte)(pixel.A & mask);
                     break;
             }
