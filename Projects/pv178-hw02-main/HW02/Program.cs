@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Text;
 using SixLabors.ImageSharp;
+using System.Diagnostics;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -31,24 +32,40 @@ List<byte[]> dataChunks = stegoObject.GetDataChunks(imageNames.Count()).ToList()
 var stegoImageProcessor = new StegoImageProcessor();
 // Do the magic...
 // Load the images
+Stopwatch stopwatch = new();
 List<string> inputPaths = new();
 foreach (string imageName in imageNames)
 {
     inputPaths.Add(Path.Combine(inputPath, imageName));
 }
+stopwatch.Start();
 Image<Rgba32>[] images = await stegoImageProcessor.LoadImagesAsync(inputPaths.ToArray());
+stopwatch.Stop();
+Console.WriteLine($"Initial loading of images took {stopwatch.ElapsedMilliseconds} [ms]");
 
 // Encode it
+stopwatch.Restart();
 Image<Rgba32>[] encodedImages = await stegoImageProcessor.EncodeImagesAsync(images, dataChunks);
+stopwatch.Stop();
+Console.WriteLine($"Encoding took {stopwatch.ElapsedMilliseconds} [ms]");
 
 // Save the images
+stopwatch.Restart();
 string[] savedImages = await stegoImageProcessor.SaveImagesAsync(encodedImages, outputPath, imageNames);
+stopwatch.Stop();
+Console.WriteLine($"Saving took {stopwatch.ElapsedMilliseconds} [ms]");
 
 // Again load the images, but the encoded ones and decode the data
+stopwatch.Restart();
 Image<Rgba32>[] encodedImagesToDecode = await stegoImageProcessor.LoadImagesAsync(savedImages);
+stopwatch.Stop();
+Console.WriteLine($"Loading encoded images took {stopwatch.ElapsedMilliseconds} [ms]");
 
 // Decode the data
+stopwatch.Restart();
 byte[][] decodedDataChunks = await stegoImageProcessor.DecodeImagesAsync(encodedImagesToDecode);
+stopwatch.Stop();
+Console.WriteLine($"Decoding took {stopwatch.ElapsedMilliseconds} [ms]");
 
 List<byte> decodedBytes = new();
 foreach (byte[] dataChunk in decodedDataChunks)

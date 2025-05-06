@@ -8,6 +8,9 @@ namespace HW02
 {
     public class StegoImageProcessor
     {
+
+        SemaphoreSlim taskLimit = new SemaphoreSlim(3);
+
         private struct PixelChannel
         {
             public const int Red = 1;
@@ -57,10 +60,21 @@ namespace HW02
             for (int i = 0; i < images.Count(); i++)
             {
                 string path = Path.Combine(basePath, Path.GetFileNameWithoutExtension(imagePaths[i]));
-                lock (tasks)
+                int index = i; // quite important to keep the index in the loop, otherwise it will be overwritten by the time the task is executed
+
+                Task<string> task = Task.Run(async () => 
                 {
-                    tasks.Add(SaveImageAsync(images[i], path));
-                }
+                    await taskLimit.WaitAsync();
+                    try
+                    {
+                        return await SaveImageAsync(images[index], path);
+                    }
+                    finally
+                    {
+                        taskLimit.Release();
+                    }
+                });
+                tasks.Add(task);
             }
 
             return await Task.WhenAll(tasks);
@@ -77,10 +91,21 @@ namespace HW02
 
             for (int i = 0; i < imagePaths.Count(); i++)
             {
-                lock (tasks)
+                int index = i; // quite important to keep the index in the loop, otherwise it will be overwritten by the time the task is executed
+
+                Task<Image<Rgba32>> task = Task.Run(async () =>
                 {
-                    tasks.Add(SixLabors.ImageSharp.Image.LoadAsync<Rgba32>(imagePaths[i]));
-                }
+                    await taskLimit.WaitAsync();
+                    try
+                    {
+                        return await LoadImageAsync(imagePaths[index]);
+                    }
+                    finally
+                    {
+                        taskLimit.Release();
+                    }
+                });
+                tasks.Add(task);
             }
             
             return await Task.WhenAll(tasks);
@@ -98,7 +123,21 @@ namespace HW02
 
             for (int i = 0; i < images.Count(); i++)
             {
-                tasks.Add(EncodePayload(images[i], payloads[i]));
+                int index = i; // quite important to keep the index in the loop, otherwise it will be overwritten by the time the task is executed
+
+                Task<Image<Rgba32>> task = Task.Run(async () =>
+                {
+                    await taskLimit.WaitAsync();
+                    try
+                    {
+                        return await EncodePayload(images[index], payloads[index]);
+                    }
+                    finally
+                    {
+                        taskLimit.Release();
+                    }
+                });
+                tasks.Add(task);
             }
 
             return await Task.WhenAll(tasks);
@@ -115,10 +154,20 @@ namespace HW02
 
             for (int i = 0; i < images.Count(); i++)
             {
-                lock (tasks)
+                int index = i; // quite important to keep the index in the loop, otherwise it will be overwritten by the time the task is executed
+                Task<byte[]> task = Task.Run(async () =>
                 {
-                    tasks.Add(ExtractPayload(images[i]));
-                }
+                    await taskLimit.WaitAsync();
+                    try
+                    {
+                        return await ExtractPayload(images[index]);
+                    }
+                    finally
+                    {
+                        taskLimit.Release();
+                    }
+                });
+                tasks.Add(task);
             }
 
             return await Task.WhenAll(tasks);
@@ -144,7 +193,6 @@ namespace HW02
         public async Task<string> SaveImageAsync(Image<Rgba32> image, string path)
         {
             string fullPath = path + ".png";
-
             await image.SaveAsync(fullPath);
 
             return fullPath;
