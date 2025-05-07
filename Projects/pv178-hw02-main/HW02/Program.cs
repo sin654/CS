@@ -55,6 +55,9 @@ string[] savedImages = await stegoImageProcessor.SaveImagesAsync(encodedImages, 
 stopwatch.Stop();
 Console.WriteLine($"Saving took {stopwatch.ElapsedMilliseconds} [ms]");
 
+// Dispose the images
+StegoImageProcessor.DisposeImages(encodedImages);
+
 // Again load the images, but the encoded ones and decode the data
 stopwatch.Restart();
 Image<Rgba32>[] encodedImagesToDecode = await stegoImageProcessor.LoadImagesAsync(savedImages);
@@ -66,6 +69,9 @@ stopwatch.Restart();
 byte[][] decodedDataChunks = await stegoImageProcessor.DecodeImagesAsync(encodedImagesToDecode);
 stopwatch.Stop();
 Console.WriteLine($"Decoding took {stopwatch.ElapsedMilliseconds} [ms]");
+
+// Dispose the images
+StegoImageProcessor.DisposeImages(encodedImagesToDecode);
 
 List<byte> decodedBytes = new();
 foreach (byte[] dataChunk in decodedDataChunks)

@@ -472,5 +472,11 @@ namespace HW02
 
             return (channel, chunkSize, pixelCount);
         }
+
+        public static void DisposeImages(Image<Rgba32>[] images)
+        {
+            foreach (var img in images)
+                img?.Dispose();
+        }
     }
 }
